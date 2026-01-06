@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ContractHawk // Access Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #00ff9f; font-family: 'JetBrains Mono', monospace; }
+        .cyber-border { border: 1px solid #00ff9f; box-shadow: 0 0 10px rgba(0, 255, 159, 0.2); }
+        .cyber-input { background: #0b0b0f; border: 1px solid #333; color: white; padding: 12px; width: 100%; outline: none; transition: 0.3s; }
+        .cyber-input:focus { border-color: #00ff9f; box-shadow: 0 0 15px rgba(0, 255, 159, 0.2); }
+        .cyber-btn { background: #00ff9f; color: black; font-weight: bold; padding: 12px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .cyber-btn:hover { background: white; box-shadow: 0 0 20px #00ff9f; }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+
+    <div class="w-96 p-8 cyber-border bg-black/80 backdrop-blur-sm relative">
+        <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-green-400"></div>
+        <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-green-400"></div>
+        <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-green-400"></div>
+        <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-green-400"></div>
+
+        <h1 class="text-3xl font-bold text-center mb-1 tracking-tighter">CONTRACT<span class="text-white">HAWK</span></h1>
+        <p class="text-xs text-center text-gray-500 mb-8 tracking-[0.3em]">INTELLIGENCE SYSTEM v2.0</p>
+
+        {% if msg %}
+        <div class="{{ msg_color }} border border-dashed border-gray-700 p-2 mb-4 text-xs text-center animate-pulse">
+            > {{ msg }}
+        </div>
+        {% endif %}
+
+        <form action="/auth/login" method="post" class="space-y-4">
+            <div>
+                <label class="text-xs text-gray-500">AGENT ID</label>
+                <input type="text" name="username" class="cyber-input" required placeholder="Enter Codename">
+            </div>
+            <div>
+                <label class="text-xs text-gray-500">SECURITY KEY</label>
+                <input type="password" name="password" class="cyber-input" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="cyber-btn">AUTHENTICATE</button>
+        </form>
+
+        <div class="mt-8 pt-4 border-t border-gray-800 text-center">
+            <p class="text-xs text-gray-600 mb-2">NEW OPERATIVE?</p>
+            <form action="/auth/register" method="post" class="flex gap-2">
+                <input type="text" name="username" placeholder="New ID" class="bg-gray-900 border border-gray-700 text-xs text-white p-2 w-1/2">
+                <input type="password" name="password" placeholder="New Key" class="bg-gray-900 border border-gray-700 text-xs text-white p-2 w-1/2">
+                <button class="text-xs text-green-500 underline">REGISTER</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
