@@ -13,44 +13,20 @@
         @keyframes scan { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
         .text-neon { text-shadow: 0 0 5px rgba(0, 255, 159, 0.5); }
         
-        /* Custom Scrollbar */
         textarea::-webkit-scrollbar, div::-webkit-scrollbar { width: 8px; }
         textarea::-webkit-scrollbar-track, div::-webkit-scrollbar-track { background: #0b0b0f; }
         textarea::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         textarea::-webkit-scrollbar-thumb:hover { background: #00ff9f; }
 
-        /* CHAT BUBBLES */
-        .chat-bubble-user {
-            background: #00d4ff;
-            color: black;
-            padding: 10px 14px;
-            border-radius: 12px 12px 0 12px;
-            max-width: 85%;
-            margin-left: auto;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-bottom: 12px;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-        
-        .chat-bubble-ai {
-            background: #0f0f13;
-            border: 1px solid rgba(0, 255, 159, 0.3);
-            color: #e0e0e0;
-            padding: 14px;
-            border-radius: 12px 12px 12px 0;
-            max-width: 95%;
-            margin-right: auto;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            margin-bottom: 12px;
-            white-space: pre-wrap; /* Respects new lines */
-        }
-        
-        /* Formatting for Markdown-style text from AI */
+        .chat-bubble-user { background: #00d4ff; color: black; padding: 10px 14px; border-radius: 12px 12px 0 12px; max-width: 85%; margin-left: auto; font-weight: bold; font-size: 0.8rem; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 212, 255, 0.3); }
+        .chat-bubble-ai { background: #0f0f13; border: 1px solid rgba(0, 255, 159, 0.3); color: #e0e0e0; padding: 14px; border-radius: 12px 12px 12px 0; max-width: 95%; margin-right: auto; font-size: 0.85rem; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap; }
         .chat-bubble-ai strong { color: #00ff9f; font-weight: bold; }
         .chat-bubble-ai ul { list-style-type: disc; padding-left: 20px; margin: 5px 0; }
         .chat-bubble-ai li { margin-bottom: 4px; }
+
+        .history-item { border: 1px solid #333; padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; background: #0a0a0a; }
+        .history-item:hover { border-color: #00ff9f; background: #111; }
+        .history-item.active { border-color: #00d4ff; background: rgba(0, 212, 255, 0.05); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col overflow-hidden">
@@ -69,7 +45,7 @@
 
     <main class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-0 relative">
         
-        <div class="p-8 border-r border-white/10 flex flex-col h-full">
+        <div class="p-8 border-r border-white/10 flex flex-col h-full bg-[#050505]">
             <div class="flex justify-between mb-4">
                 <h2 class="text-[#00d4ff] font-bold flex items-center gap-2"><i class="ph ph-file-text"></i> TARGET DATA</h2>
                 <button onclick="clearText()" class="text-xs text-gray-500 hover:text-white">[ CLEAR ]</button>
@@ -83,11 +59,21 @@
             <input type="file" id="file-input" style="display: none;" accept=".pdf,.docx,.txt">
             <p id="upload-status" style="color: #00FF99; font-size: 12px; display: none; margin-bottom: 10px;">>> DECRYPTION SUCCESSFUL.</p>
 
-            <textarea id="contractInput" class="flex-grow bg-[#0b0b0f] border border-gray-800 text-sm p-4 text-gray-300 focus:outline-none focus:border-[#00ff9f] resize-none font-mono" placeholder="// PASTE LEGAL TEXT HERE FOR ANALYSIS..."></textarea>
+            <textarea id="contractInput" class="h-40 bg-[#0b0b0f] border border-gray-800 text-sm p-4 text-gray-300 focus:outline-none focus:border-[#00ff9f] resize-none font-mono mb-4" placeholder="// PASTE LEGAL TEXT HERE FOR ANALYSIS..."></textarea>
             
-            <button onclick="runScan()" id="scanBtn" class="mt-6 bg-[#00ff9f] hover:bg-white text-black font-bold py-4 transition-all flex items-center justify-center gap-2 tracking-widest uppercase">
+            <button onclick="runScan()" id="scanBtn" class="mb-8 bg-[#00ff9f] hover:bg-white text-black font-bold py-4 transition-all flex items-center justify-center gap-2 tracking-widest uppercase shadow-[0_0_15px_rgba(0,255,159,0.3)]">
                 <i class="ph-bold ph-radar"></i> Initiate Neural Scan
             </button>
+
+            <div class="flex-grow flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center mb-2 border-b border-gray-800 pb-2">
+                    <h3 class="text-xs font-bold text-gray-500 tracking-widest"><i class="ph-bold ph-clock-counter-clockwise"></i> MISSION LOG</h3>
+                    <button onclick="clearHistory()" class="text-[10px] text-red-500 hover:text-red-400">CLEAR ALL</button>
+                </div>
+                <div id="historyList" class="flex-grow overflow-y-auto pr-2">
+                    <div class="text-center text-gray-700 text-xs mt-4">NO PRIOR MISSIONS</div>
+                </div>
+            </div>
         </div>
 
         <div class="p-8 bg-[#08080a] relative overflow-hidden h-full flex flex-col">
@@ -101,7 +87,6 @@
 
             <div class="mb-8 border-b border-white/10 pb-4 flex justify-between items-center">
                 <h2 class="text-[#ff003c] font-bold flex items-center gap-2"><i class="ph ph-warning-octagon"></i> THREAT ASSESSMENT</h2>
-                
                 <button onclick="toggleChat()" class="text-[#00d4ff] hover:text-white border border-[#00d4ff] hover:bg-[#00d4ff]/10 px-3 py-1 text-xs font-bold tracking-widest flex items-center gap-2 transition-all">
                     <i class="ph-bold ph-chat-teardrop-text"></i> INTERROGATE
                 </button>
@@ -145,11 +130,9 @@
                 <h3 class="text-[#00d4ff] font-bold flex items-center gap-2"><i class="ph-fill ph-robot"></i> INTERROGATOR</h3>
                 <button onclick="toggleChat()" class="text-gray-500 hover:text-white"><i class="ph-bold ph-x text-xl"></i></button>
             </div>
-            
             <div id="chatHistory" class="flex-grow p-4 overflow-y-auto font-mono bg-black/40">
                 <div class="text-gray-500 text-xs text-center mt-4 mb-4 opacity-50">>> SECURE CHANNEL ESTABLISHED</div>
             </div>
-
             <div class="p-4 border-t border-[#00ff9f]/30 bg-[#0a0a0a]">
                 <div class="flex gap-2">
                     <input type="text" id="chatInput" placeholder="Ask about terms..." class="flex-grow bg-[#111] border border-gray-700 text-white px-3 py-2 text-sm focus:outline-none focus:border-[#00d4ff]" onkeypress="if(event.key==='Enter') sendChat()">
@@ -162,8 +145,7 @@
 
     <div id="neutralizeModal" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onclick="if(event.target === this) this.classList.add('hidden')">
         <div class="glass-panel w-full max-w-4xl p-6 relative border border-[#00ff9f] flex flex-col h-[80vh]">
-            <button onclick="document.getElementById('neutralizeModal').classList.add('hidden')" 
-                    class="absolute top-4 right-4 text-white hover:text-[#00ff9f] transition-colors font-bold text-2xl z-50">✕</button>
+            <button onclick="document.getElementById('neutralizeModal').classList.add('hidden')" class="absolute top-4 right-4 text-white hover:text-[#00ff9f] transition-colors font-bold text-2xl z-50">✕</button>
             <h2 class="text-[#00ff9f] font-bold text-xl mb-2 flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> SAFE CONTRACT VERSION</h2>
             <p class="text-xs text-gray-400 mb-4">The AI has rewritten the predatory clauses to be fair and standard.</p>
             <div id="fixLoading" class="hidden flex-grow flex items-center justify-center flex-col">
@@ -178,14 +160,18 @@
     </div>
 
     <script>
-        // GLOBAL VARS
         let currentRedFlags = [];
+        let currentFileName = "Manual_Entry";
         const fileInput = document.getElementById('file-input');
         const dropZone = document.getElementById('drop-zone');
         const textArea = document.getElementById('contractInput');
         const statusMsg = document.getElementById('upload-status');
+        const historyList = document.getElementById('historyList');
 
-        // UPLOAD LOGIC
+        window.onload = function() {
+            renderHistory();
+        }
+
         function triggerUpload() { fileInput.click(); }
         fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#00FF99'; });
@@ -194,6 +180,7 @@
 
         function handleFileUpload(file) {
             if (!file) return;
+            currentFileName = file.name;
             dropZone.innerHTML = "<p style='color:#00FF99'>[ UPLOADING... ]</p>";
             const formData = new FormData();
             formData.append('file', file);
@@ -213,9 +200,90 @@
             });
         }
 
-        function clearText() { textArea.value = ""; }
+        function clearText() { textArea.value = ""; currentFileName = "Manual_Entry"; }
 
-        // SCAN LOGIC
+        function saveToHistory(data, textContent) {
+            const history = JSON.parse(localStorage.getItem('contractHawkHistory') || '[]');
+            const newItem = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString(),
+                fileName: currentFileName.length > 20 ? currentFileName.substring(0,18) + ".." : currentFileName,
+                score: data.risk_score,
+                verdict: data.verdict,
+                summary: data.summary,
+                red_flags: data.red_flags,
+                content: textContent
+            };
+            history.unshift(newItem);
+            if(history.length > 10) history.pop();
+            localStorage.setItem('contractHawkHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('contractHawkHistory') || '[]');
+            historyList.innerHTML = "";
+            if(history.length === 0) {
+                historyList.innerHTML = `<div class="text-center text-gray-700 text-xs mt-4">NO PRIOR MISSIONS</div>`;
+                return;
+            }
+            history.forEach(item => {
+                const color = item.score > 60 ? 'text-[#ff003c]' : (item.score > 30 ? 'text-yellow-500' : 'text-[#00ff9f]');
+                const div = document.createElement('div');
+                div.className = "history-item";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-gray-400">${item.fileName}</span>
+                        <span class="text-[10px] text-gray-600">${item.date}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold ${color}">${item.verdict}</span>
+                        <span class="text-xs font-mono text-gray-500">RISK: ${item.score}</span>
+                    </div>
+                `;
+                div.onclick = () => loadFromHistory(item);
+                historyList.appendChild(div);
+            });
+        }
+
+        function loadFromHistory(item) {
+            textArea.value = item.content || "";
+            currentFileName = item.fileName;
+            currentRedFlags = item.red_flags;
+            
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('resultsArea').classList.remove('hidden');
+            
+            const scoreEl = document.getElementById('scoreDisplay');
+            scoreEl.innerText = item.score + "/100";
+            if (item.score > 60) {
+                scoreEl.className = "text-4xl font-bold text-[#ff003c] text-neon";
+                document.getElementById('neutralizeBtn').classList.remove('hidden');
+            } else {
+                scoreEl.className = "text-4xl font-bold text-[#00ff9f]";
+                document.getElementById('neutralizeBtn').classList.add('hidden');
+            }
+            
+            document.getElementById('verdictDisplay').innerText = item.verdict;
+            document.getElementById('summaryText').innerText = item.summary;
+            
+            const list = document.getElementById('redFlagsList');
+            list.innerHTML = "";
+            item.red_flags.forEach(flag => {
+                const li = document.createElement('li');
+                li.className = "flex items-start gap-2";
+                li.innerHTML = `<i class="ph-fill ph-warning text-[#ff003c] mt-1"></i> <span>${flag}</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        function clearHistory() {
+            if(confirm("WIPE MISSION LOGS?")) {
+                localStorage.removeItem('contractHawkHistory');
+                renderHistory();
+            }
+        }
+
         async function runScan() {
             const text = textArea.value;
             if (!text) { alert("NO DATA"); return; }
@@ -232,6 +300,7 @@
                 });
                 const data = await res.json();
                 currentRedFlags = data.red_flags || [];
+                
                 document.getElementById('scannerOverlay').classList.add('hidden');
                 document.getElementById('resultsArea').classList.remove('hidden');
 
@@ -256,13 +325,15 @@
                     li.innerHTML = `<i class="ph-fill ph-warning text-[#ff003c] mt-1"></i> <span>${flag}</span>`;
                     list.appendChild(li);
                 });
+
+                saveToHistory(data, text);
+
             } catch (err) {
                 alert("Scan Failed");
                 document.getElementById('scannerOverlay').classList.add('hidden');
             }
         }
 
-        // NEUTRALIZE LOGIC
         async function runNeutralize() {
             const modal = document.getElementById('neutralizeModal');
             const loader = document.getElementById('fixLoading');
@@ -305,26 +376,14 @@
             a.remove();
         }
 
-        // --- ENHANCED CHAT FUNCTIONS ---
-        function toggleChat() {
-            const panel = document.getElementById('chatPanel');
-            panel.classList.toggle('translate-x-full');
-        }
-
-        // FORMATTING HELPER: Converts basic markdown to HTML
+        function toggleChat() { document.getElementById('chatPanel').classList.toggle('translate-x-full'); }
         function formatAIResponse(text) {
-            // 1. Bold: **text** -> <strong>text</strong>
             let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // 2. Bullet points: * text -> <li>text</li> (simple wrap)
-            // Note: A full markdown parser is complex, this is a lightweight "hacker" version
             formatted = formatted.replace(/^\* (.*$)/gim, '<li>$1</li>');
             return formatted;
         }
-
-        // TYPEWRITER EFFECT
         function typeWriter(element, text, i = 0) {
             if (i < text.length) {
-                // Determine if we are inside a tag (skip typing tags)
                 if (text.substring(i).startsWith('<')) {
                     let endTag = text.indexOf('>', i);
                     element.innerHTML += text.substring(i, endTag + 1);
@@ -333,29 +392,24 @@
                 } else {
                     element.innerHTML += text.charAt(i);
                     i++;
-                    setTimeout(() => typeWriter(element, text, i), 10); // Speed: 10ms per char
+                    setTimeout(() => typeWriter(element, text, i), 10);
                 }
             } else {
-                // Scroll to bottom when done
                 const history = document.getElementById('chatHistory');
                 history.scrollTop = history.scrollHeight;
             }
         }
-
         async function sendChat() {
             const input = document.getElementById('chatInput');
             const history = document.getElementById('chatHistory');
             const text = textArea.value;
             const question = input.value;
-            
             if(!question || !text) return;
 
-            // 1. ADD USER BUBBLE
             history.innerHTML += `<div class="chat-bubble-user">${question}</div>`;
             input.value = "";
             history.scrollTop = history.scrollHeight;
 
-            // 2. SHOW LOADING INDICATOR
             const loadingDiv = document.createElement('div');
             loadingDiv.className = "chat-bubble-ai opacity-50";
             loadingDiv.innerHTML = `<span class="animate-pulse">>> ANALYZING...</span>`;
@@ -369,20 +423,12 @@
                     body: JSON.stringify({ content: text, question: question })
                 });
                 const data = await res.json();
-                
-                // 3. REMOVE LOADING & ADD AI BUBBLE WITH TYPEWRITER EFFECT
                 loadingDiv.remove();
-                
                 const aiDiv = document.createElement('div');
                 aiDiv.className = "chat-bubble-ai";
                 history.appendChild(aiDiv);
-                
-                // Format text first (bolding, etc)
                 const formattedText = formatAIResponse(data.answer);
-                
-                // Trigger typing animation
                 typeWriter(aiDiv, formattedText);
-
             } catch (err) {
                 loadingDiv.remove();
                 history.innerHTML += `<div class="text-red-500 text-xs text-center my-2">>> CONNECTION LOST <<</div>`;
